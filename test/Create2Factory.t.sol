@@ -17,7 +17,8 @@ contract Create2FactoryTest is Test {
         create2Factory.setWhitelistUser(pcsDeployer, true);
     }
 
-    function test_Deploy_differentNonce(uint64 nonce) public {
+    /// @dev different nonce should still deploy at the same address
+    function test_Deploy_DifferentNonce(uint64 nonce) public {
         vm.setNonce(pcsDeployer, nonce);
         vm.startPrank(pcsDeployer);
 
@@ -27,7 +28,23 @@ contract Create2FactoryTest is Test {
         address deployed = create2Factory.deploy(salt, creationCode);
 
         // verify
-        address expectedDeployed = create2Factory.getDeployed(pcsDeployer, salt, keccak256(creationCode));
+        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
+        assertEq(deployed, expectedDeployed);
+    }
+
+    /// @dev different deployer should still deploy at the same address
+    function test_Deploy_DifferentDeployer(address deployer) public {
+        vm.assume(deployer != address(0));
+        create2Factory.setWhitelistUser(deployer, true);
+
+        // deploy as deployer
+        bytes memory creationCode = type(MockOwner).creationCode;
+        bytes32 salt = bytes32(uint256(0x1234));
+        vm.prank(deployer);
+        address deployed = create2Factory.deploy(salt, creationCode);
+
+        // verify
+        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
         assertEq(deployed, expectedDeployed);
     }
 
@@ -38,7 +55,7 @@ contract Create2FactoryTest is Test {
         bytes memory creationCode = type(MockOwner).creationCode;
         bytes32 salt = bytes32(uint256(0x1234));
         vm.expectRevert("Create2Factory: caller is not whitelisted");
-        address deployed = create2Factory.deploy(salt, creationCode);
+        create2Factory.deploy(salt, creationCode);
     }
 
     function test_Execute() public {
@@ -55,7 +72,7 @@ contract Create2FactoryTest is Test {
 
         // execute
         bytes memory data = abi.encodeWithSignature("transferOwnership(address)", pcsDeployer);
-        create2Factory.execute(salt, keccak256(creationCode), data);
+        create2Factory.execute(deployed, data);
         assertEq(owner.owner(), pcsDeployer);
     }
 
@@ -73,23 +90,17 @@ contract Create2FactoryTest is Test {
 
         // execute
         bytes memory data = abi.encodeWithSignature("payableFunc()");
-        create2Factory.execute{value: 1 ether}(salt, keccak256(creationCode), data);
+        create2Factory.execute{value: 1 ether}(deployed, data);
 
         // after
         assertEq(deployed.balance, 1 ether);
     }
 
     function test_Execute_NotWhitelisted() public {
-        // before deploy
-        vm.startPrank(pcsDeployer);
-        bytes memory creationCode = type(MockOwner).creationCode;
-        bytes32 salt = bytes32(uint256(0x1234));
-        vm.stopPrank();
-
         vm.prank(alice);
         vm.expectRevert("Create2Factory: caller is not whitelisted");
         bytes memory data = abi.encodeWithSignature("transferOwnership(address)", alice);
-        create2Factory.execute(salt, keccak256(creationCode), data);
+        create2Factory.execute(makeAddr("random"), data);
     }
 
     function test_SetWhitelistedUser() public {
