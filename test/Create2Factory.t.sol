@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {Create2Factory} from "../src/Create2Factory.sol";
 import {MockOwner} from "./mocks/MockOwner.sol";
+import {MockWithConstructorArgs} from "./mocks/MockWithConstructorArgs.sol";
 
 contract Create2FactoryTest is Test {
     Create2Factory create2Factory;
@@ -15,6 +16,21 @@ contract Create2FactoryTest is Test {
     function setUp() public {
         create2Factory = new Create2Factory();
         create2Factory.setWhitelistUser(pcsDeployer, true);
+    }
+
+    /// @dev different nonce should still deploy at the same address
+    function test_Deploy_ContractWithArgs() public {
+        // deploy
+        bytes memory creationCode = abi.encodePacked(type(MockWithConstructorArgs).creationCode, abi.encode(42));
+        bytes32 salt = bytes32(uint256(0x1234));
+        address deployed = create2Factory.deploy(salt, creationCode);
+
+        // verify
+        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
+        assertEq(deployed, expectedDeployed);
+
+        MockWithConstructorArgs deployedContract = MockWithConstructorArgs(deployed);
+        assertEq(deployedContract.args(), 42);
     }
 
     /// @dev different nonce should still deploy at the same address
