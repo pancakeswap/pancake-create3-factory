@@ -8,5 +8,6 @@ fs_permissions = [
     { access = "read", path = "./foundry-out" },
 ]
 evm_version = 'cancun'
+optimizer_runs = 30_000
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
