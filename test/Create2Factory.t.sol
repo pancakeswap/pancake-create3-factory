@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "forge-std/Test.sol";
+import "forge-std/src/Test.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {Create2Factory} from "../src/Create2Factory.sol";
 import {MockOwner} from "./mocks/MockOwner.sol";
 import {MockWithConstructorArgs} from "./mocks/MockWithConstructorArgs.sol";
 
-contract Create2FactoryTest is Test {
+contract Create2FactoryTest is Test, GasSnapshot {
     Create2Factory create2Factory;
 
     address pcsDeployer = makeAddr("pcsDeployer");
@@ -24,6 +25,7 @@ contract Create2FactoryTest is Test {
         bytes memory creationCode = abi.encodePacked(type(MockWithConstructorArgs).creationCode, abi.encode(42));
         bytes32 salt = bytes32(uint256(0x1234));
         address deployed = create2Factory.deploy(salt, creationCode);
+        snapLastCall("Create2FactoryTest#test_Deploy_ContractWithArgs");
 
         // verify
         address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
@@ -127,12 +129,14 @@ contract Create2FactoryTest is Test {
         vm.expectEmit();
         emit Create2Factory.SetWhitelist(alice, true);
         create2Factory.setWhitelistUser(alice, true);
+        snapLastCall("Create2FactoryTest#test_SetWhitelistedUser_true");
         assertEq(create2Factory.isUserWhitelisted(alice), true);
 
         // set not whitelisted
         vm.expectEmit();
         emit Create2Factory.SetWhitelist(alice, false);
         create2Factory.setWhitelistUser(alice, false);
+        snapLastCall("Create2FactoryTest#test_SetWhitelistedUser_false");
         assertEq(create2Factory.isUserWhitelisted(alice), false);
     }
 
