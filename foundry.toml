@@ -2,5 +2,13 @@
 src = "src"
 out = 'foundry-out'
 libs = ["lib"]
+solc_version = '0.8.26'
+evm_version = 'cancun'
+via_ir = true
+ffi = true
+fs_permissions = [
+    { access = "read", path = "./foundry-out" },
+    { access = "read", path = "./script/config" },
+]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

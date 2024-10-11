@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
+import {Create2Factory} from "../src/Create2Factory.sol";
 
 abstract contract BaseScript is Script {
     string path;
@@ -25,5 +26,10 @@ abstract contract BaseScript is Script {
         require(decodedData != address(0x20), "Address not set");
 
         return decodedData;
+    }
+
+    function getCreate2Factory() public view returns (Create2Factory) {
+        address create2FactoryAddr = getAddressFromConfig("create2Factory");
+        return Create2Factory(create2FactoryAddr);
     }
 }

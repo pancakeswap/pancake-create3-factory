@@ -1,3 +1,6 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 @openzeppelin/=lib/openzeppelin-contracts/
+pancake-v4-core/=lib/pancake-v4-core/
+pancake-v4-periphery/=lib/pancake-v4-periphery/
+pancake-v4-universal-router/=lib/pancake-v4-universal-router
