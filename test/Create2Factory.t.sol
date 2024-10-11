@@ -28,7 +28,7 @@ contract Create2FactoryTest is Test, GasSnapshot {
         snapLastCall("Create2FactoryTest#test_Deploy_ContractWithArgs");
 
         // verify
-        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
+        address expectedDeployed = create2Factory.computeAddress(salt, keccak256(creationCode));
         assertEq(deployed, expectedDeployed);
 
         MockWithConstructorArgs deployedContract = MockWithConstructorArgs(deployed);
@@ -46,7 +46,7 @@ contract Create2FactoryTest is Test, GasSnapshot {
         address deployed = create2Factory.deploy(salt, creationCode);
 
         // verify
-        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
+        address expectedDeployed = create2Factory.computeAddress(salt, keccak256(creationCode));
         assertEq(deployed, expectedDeployed);
     }
 
@@ -62,7 +62,7 @@ contract Create2FactoryTest is Test, GasSnapshot {
         address deployed = create2Factory.deploy(salt, creationCode);
 
         // verify
-        address expectedDeployed = create2Factory.getDeployed(salt, keccak256(creationCode));
+        address expectedDeployed = create2Factory.computeAddress(salt, keccak256(creationCode));
         assertEq(deployed, expectedDeployed);
     }
 
