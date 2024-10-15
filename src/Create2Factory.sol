@@ -28,6 +28,7 @@ contract Create2Factory is ICreate2Factory, Ownable2Step, ReentrancyGuard {
         external
         payable
         onlyWhitelisted
+        nonReentrant
         returns (address deployed)
     {
         deployed = Create2.deploy(msg.value, salt, creationCode);

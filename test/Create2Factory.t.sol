@@ -19,7 +19,6 @@ contract Create2FactoryTest is Test, GasSnapshot {
         create2Factory.setWhitelistUser(pcsDeployer, true);
     }
 
-    /// @dev different nonce should still deploy at the same address
     function test_Deploy_ContractWithArgs() public {
         // deploy
         bytes memory creationCode = abi.encodePacked(type(MockWithConstructorArgs).creationCode, abi.encode(42));
@@ -50,7 +49,7 @@ contract Create2FactoryTest is Test, GasSnapshot {
         assertEq(deployed, expectedDeployed);
     }
 
-    /// @dev different deployer should still deploy at the same address
+    /// @dev deployment address should match with different address
     function test_Deploy_DifferentDeployer(address deployer) public {
         vm.assume(deployer != address(0));
         create2Factory.setWhitelistUser(deployer, true);
