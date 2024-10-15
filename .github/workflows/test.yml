@@ -23,3 +23,6 @@ jobs:
 
       - name: Run tests
         run: forge test -vvv --isolate
+        env:
+          TESTNET_FORK_URL_BSC: ${{ secrets.TESTNET_FORK_URL_BSC }}
+          TESTNET_FORK_URL_SEPOLIA: ${{ secrets.TESTNET_FORK_URL_SEPOLIA }}
