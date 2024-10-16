@@ -7,7 +7,7 @@ interface ICreate3Factory {
     /**
      * @notice create3 deploy a contract
      * @dev So long the same salt is used, the contract will be deployed at the same address on other chain
-     * @param salt Salt of the contract creation, resulting address will be derivated from this value only
+     * @param salt Salt of the contract creation, resulting address will be derived from this value only
      * @param creationCode Creation code (constructor + args) of the contract to be deployed, this value doesn't affect the resulting address
      * @param creationFund In WEI of ETH to be forwarded to target contract constructor
      * @param afterDeploymentExecutionPayload Payload to be executed after contract creation

@@ -45,6 +45,24 @@ contract Create3FactoryTest is Test, GasSnapshot {
         assertEq(Ownable(deployed).owner(), expectedOwner);
     }
 
+    function test_Deploy_MockOwnerWithConstructorArgs_BubbleUpRevert() public {
+        // 1. prepare salt and creation code
+        bytes32 salt = bytes32(uint256(0x1234));
+        bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(42));
+
+        // 2. prepare owner transfer payload
+        // set target owner to address(0) to trigger revert
+        bytes memory afterDeploymentExecutionPayload =
+            abi.encodeWithSelector(Ownable.transferOwnership.selector, address(0));
+
+        // 3. make sure this contract has enough balance
+        vm.deal(address(this), 1 ether);
+
+        // 4. deploy
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableInvalidOwner.selector, address(0)));
+        create3Factory.deploy{value: 1 ether}(salt, creationCode, 1 ether, afterDeploymentExecutionPayload, 0 ether);
+    }
+
     function test_Deploy_MockAccessControlWithConstructorArgs() public {
         // 1. prepare salt and creation code
         bytes32 salt = bytes32(uint256(0x1234));

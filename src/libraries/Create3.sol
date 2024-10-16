@@ -7,7 +7,7 @@ import {CustomizedProxyChild} from "../CustomizedProxyChild.sol";
  * @dev Referenced from https://github.com/0xsequence/create3/blob/master/contracts/Create3.sol
  * Updated PROXY_CHILD_BYTECODE to support customized deployment logic
  * @title A library for deploying contracts EIP-3171 style.
- *   @author Agustin Aguilar <aa@horizon.io>
+ * @author Agustin Aguilar <aa@horizon.io>
  */
 library Create3 {
     error ErrorCreatingProxy();
@@ -31,7 +31,7 @@ library Create3 {
 
     /**
      * @notice Creates a new contract with given `_creationCode` and `_salt`
-     * @param _salt Salt of the contract creation, resulting address will be derivated from this value only
+     * @param _salt Salt of the contract creation, resulting address will be derived from this value only
      * @param _creationCode Creation code (constructor) of the contract to be deployed, this value doesn't affect the resulting address
      * @param _creationFund In WEI of ETH to be forwarded to target contract constructor
      * @param _afterDeploymentExecutionPayload Payload to be executed after contract creation
@@ -69,7 +69,7 @@ library Create3 {
 
     /**
      * @notice Computes the resulting address of a contract deployed using address(this) and the given `_salt`
-     * @param _salt Salt of the contract creation, resulting address will be derivated from this value only
+     * @param _salt Salt of the contract creation, resulting address will be derived from this value only
      * @return addr of the deployed contract, reverts on error
      *
      * @dev The address creation formula is: keccak256(rlp([keccak256(0xff ++ address(this) ++ _salt ++ keccak256(childBytecode))[12:], 0x01]))

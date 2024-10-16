@@ -3,7 +3,8 @@ pragma solidity ^0.8.24;
 
 import "forge-std/src/Test.sol";
 import {Create3Factory} from "../src/Create3Factory.sol";
-import {MockOwner} from "./mocks/MockOwner.sol";
+import {MockOwnerWithConstructorArgs} from "./mocks/MockOwnerWithConstructorArgs.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @dev run tests on testnet fork (bsc/sepolia) to verify same contract address across chain. To run the test,
 /// ensure TESTNET_FORK_URL_BSC and TESTNET_FORK_URL_SEPOLIA environment variable are set
@@ -11,6 +12,7 @@ contract Create3FactoryForkTest is Test {
     Create3Factory create3Factory;
 
     address create3Deployer = makeAddr("pcsDeployer");
+    address expectedOwner = makeAddr("expectedOwner");
     /// @dev address with difference nonce on bsc / eth
     address pcsDeployer = 0x42571B8414c68B63A2729146CE93F23639d25399;
 
@@ -44,18 +46,26 @@ contract Create3FactoryForkTest is Test {
         ////////////////////////////////////////////////////////
         // Step 2: Deploy contracts on both chain using pcsDeployer
         ////////////////////////////////////////////////////////
-        bytes memory creationCode = type(MockOwner).creationCode;
+        bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(666));
+        bytes memory afterDeploymentExecutionPayload =
+            abi.encodeWithSelector(Ownable.transferOwnership.selector, expectedOwner);
         bytes32 salt = bytes32(uint256(0x1234));
 
         vm.selectFork(bscForkId);
         vm.prank(pcsDeployer);
-        address bscMockOwner = bscCreate3.deploy(salt, creationCode, 0, new bytes(0), 0);
+        address bscDeployedAddr = bscCreate3.deploy(salt, creationCode, 0, afterDeploymentExecutionPayload, 0);
+        assertEq(MockOwnerWithConstructorArgs(bscDeployedAddr).args(), 666);
+        assertEq(Ownable(bscDeployedAddr).owner(), expectedOwner);
 
+        // update constructor args just to verify that even creation code is different, the address will be same
+        creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(888));
         vm.selectFork(sepoliaForkId);
         vm.prank(pcsDeployer);
-        address sepoliaMockOwner = sepoliaCreate3.deploy(salt, creationCode, 0, new bytes(0), 0);
+        address sepoliaDeployedAddr = sepoliaCreate3.deploy(salt, creationCode, 0, afterDeploymentExecutionPayload, 0);
+        assertEq(MockOwnerWithConstructorArgs(sepoliaDeployedAddr).args(), 888);
+        assertEq(Ownable(sepoliaDeployedAddr).owner(), expectedOwner);
 
         // assert step 2
-        assertEq(bscMockOwner, sepoliaMockOwner);
+        assertEq(bscDeployedAddr, sepoliaDeployedAddr);
     }
 }

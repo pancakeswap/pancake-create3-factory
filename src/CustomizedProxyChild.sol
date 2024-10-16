@@ -29,8 +29,14 @@ contract CustomizedProxyChild {
         if (backRunPayload.length != 0) {
             /// @dev This could be helpful when newly deployed contract
             /// needs to run some initialization logic for example owner update
-            (bool success,) = addr.call{value: backRunFund}(backRunPayload);
+            (bool success, bytes memory reason) = addr.call{value: backRunFund}(backRunPayload);
             if (!success) {
+                // bubble up the revert reason from backrun if any
+                if (reason.length > 0) {
+                    assembly {
+                        revert(add(reason, 32), mload(reason))
+                    }
+                }
                 revert BackrunExecutionFailed();
             }
         }
