@@ -53,7 +53,8 @@ contract Create3FactoryForkTest is Test {
 
         vm.selectFork(bscForkId);
         vm.prank(pcsDeployer);
-        address bscDeployedAddr = bscCreate3.deploy(salt, creationCode, 0, afterDeploymentExecutionPayload, 0);
+        address bscDeployedAddr =
+            bscCreate3.deploy(salt, creationCode, keccak256(creationCode), 0, afterDeploymentExecutionPayload, 0);
         assertEq(MockOwnerWithConstructorArgs(bscDeployedAddr).args(), 666);
         assertEq(Ownable(bscDeployedAddr).owner(), expectedOwner);
 
@@ -61,7 +62,8 @@ contract Create3FactoryForkTest is Test {
         creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(888));
         vm.selectFork(sepoliaForkId);
         vm.prank(pcsDeployer);
-        address sepoliaDeployedAddr = sepoliaCreate3.deploy(salt, creationCode, 0, afterDeploymentExecutionPayload, 0);
+        address sepoliaDeployedAddr =
+            sepoliaCreate3.deploy(salt, creationCode, keccak256(creationCode), 0, afterDeploymentExecutionPayload, 0);
         assertEq(MockOwnerWithConstructorArgs(sepoliaDeployedAddr).args(), 888);
         assertEq(Ownable(sepoliaDeployedAddr).owner(), expectedOwner);
 

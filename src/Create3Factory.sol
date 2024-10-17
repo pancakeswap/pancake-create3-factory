@@ -10,6 +10,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 /// @dev ensure this contract is deployed on multiple chain with the same address
 contract Create3Factory is ICreate3Factory, Ownable2Step, ReentrancyGuard {
     event SetWhitelist(address indexed user, bool isWhitelist);
+    event Deployed(address indexed deployed, bytes32 salt, bytes32 creationCodeHash);
 
     // Only whitelisted user can interact with create2Factory
     mapping(address user => bool isWhitelisted) public isUserWhitelisted;
@@ -27,13 +28,18 @@ contract Create3Factory is ICreate3Factory, Ownable2Step, ReentrancyGuard {
     function deploy(
         bytes32 salt,
         bytes memory creationCode,
+        bytes32 creationCodeHash,
         uint256 creationFund,
         bytes calldata afterDeploymentExecutionPayload,
         uint256 afterDeploymentExecutionFund
     ) external payable onlyWhitelisted nonReentrant returns (address deployed) {
+        if (creationCodeHash != keccak256(creationCode)) revert CreationCodeHashMismatch();
+
         deployed = Create3.create3(
             salt, creationCode, creationFund, afterDeploymentExecutionPayload, afterDeploymentExecutionFund
         );
+
+        emit Deployed(deployed, salt, creationCodeHash);
     }
 
     /// @inheritdoc ICreate3Factory

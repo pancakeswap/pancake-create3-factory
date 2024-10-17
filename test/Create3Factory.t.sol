@@ -10,6 +10,7 @@ import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {ICreate3Factory, Create3Factory} from "../src/Create3Factory.sol";
 import {MockOwnerWithConstructorArgs} from "./mocks/MockOwnerWithConstructorArgs.sol";
 import {MockAccessControlWithConstructorArgs} from "./mocks/MockAccessControlWithConstructorArgs.sol";
+import {CustomizedProxyChild} from "../src/CustomizedProxyChild.sol";
 
 contract Create3FactoryTest is Test, GasSnapshot {
     Create3Factory create3Factory;
@@ -35,14 +36,37 @@ contract Create3FactoryTest is Test, GasSnapshot {
         // 3. make sure this contract has enough balance
         vm.deal(address(this), 1 ether);
 
+        vm.expectEmit(true, true, true, true);
+        emit Create3Factory.Deployed(create3Factory.computeAddress(salt), salt, keccak256(creationCode));
+
         // 4. deploy
-        address deployed =
-            create3Factory.deploy{value: 1 ether}(salt, creationCode, 1 ether, afterDeploymentExecutionPayload, 0 ether);
+        address deployed = create3Factory.deploy{value: 1 ether}(
+            salt, creationCode, keccak256(creationCode), 1 ether, afterDeploymentExecutionPayload, 0 ether
+        );
 
         // 5. verify constructor args, balance and owner
         assertEq(MockOwnerWithConstructorArgs(deployed).args(), 42);
         assertEq(deployed.balance, 1 ether);
         assertEq(Ownable(deployed).owner(), expectedOwner);
+    }
+
+    function test_Deploy_MockOwnerWithConstructorArgs_RevertWithCreationCodeHashMismatch() public {
+        // 1. prepare salt and creation code
+        bytes32 salt = bytes32(uint256(0x1234));
+        bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(42));
+
+        // 2. prepare owner transfer payload
+        bytes memory afterDeploymentExecutionPayload =
+            abi.encodeWithSelector(Ownable.transferOwnership.selector, expectedOwner);
+
+        // 3. make sure this contract has enough balance
+        vm.deal(address(this), 1 ether);
+
+        // 4. deploy
+        vm.expectRevert(abi.encodeWithSelector(ICreate3Factory.CreationCodeHashMismatch.selector));
+        create3Factory.deploy{value: 1 ether}(
+            salt, creationCode, keccak256("anything else"), 1 ether, afterDeploymentExecutionPayload, 0 ether
+        );
     }
 
     function test_Deploy_MockOwnerWithConstructorArgs_BubbleUpRevert() public {
@@ -60,7 +84,28 @@ contract Create3FactoryTest is Test, GasSnapshot {
 
         // 4. deploy
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableInvalidOwner.selector, address(0)));
-        create3Factory.deploy{value: 1 ether}(salt, creationCode, 1 ether, afterDeploymentExecutionPayload, 0 ether);
+        create3Factory.deploy{value: 1 ether}(
+            salt, creationCode, keccak256(creationCode), 1 ether, afterDeploymentExecutionPayload, 0 ether
+        );
+    }
+
+    function test_Deploy_MockOwnerWithConstructorArgs_NotFromParent() public {
+        // 1. prepare salt and creation code
+        bytes32 salt = bytes32(uint256(0x1234));
+        bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(42));
+
+        // 2. prepare owner transfer payload
+        bytes memory afterDeploymentExecutionPayload =
+            abi.encodeWithSelector(MockOwnerWithConstructorArgs.tryReEntryChildProxy.selector);
+
+        // 3. make sure this contract has enough balance
+        vm.deal(address(this), 1 ether);
+
+        // 4. deploy
+        vm.expectRevert(abi.encodeWithSelector(CustomizedProxyChild.NotFromParent.selector));
+        create3Factory.deploy{value: 1 ether}(
+            salt, creationCode, keccak256(creationCode), 1 ether, afterDeploymentExecutionPayload, 0 ether
+        );
     }
 
     function test_Deploy_MockAccessControlWithConstructorArgs() public {
@@ -77,8 +122,9 @@ contract Create3FactoryTest is Test, GasSnapshot {
         vm.deal(address(this), 2 ether);
 
         // 4. deploy
-        address deployed =
-            create3Factory.deploy{value: 2 ether}(salt, creationCode, 2 ether, afterDeploymentExecutionPayload, 0 ether);
+        address deployed = create3Factory.deploy{value: 2 ether}(
+            salt, creationCode, keccak256(creationCode), 2 ether, afterDeploymentExecutionPayload, 0 ether
+        );
 
         // 5. verify constructor args, balance and owner
         assertEq(MockAccessControlWithConstructorArgs(deployed).args(), "hello world");
@@ -107,7 +153,12 @@ contract Create3FactoryTest is Test, GasSnapshot {
 
         // 4. deploy
         address deployed = create3Factory.deploy{value: randomValue}(
-            randomSalt, creationCode, randomValue - 1 ether, afterDeploymentExecutionPayload, 1 ether
+            randomSalt,
+            creationCode,
+            keccak256(creationCode),
+            randomValue - 1 ether,
+            afterDeploymentExecutionPayload,
+            1 ether
         );
 
         // 5. verify constructor args, balance and owner
@@ -170,7 +221,7 @@ contract Create3FactoryTest is Test, GasSnapshot {
         bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(42));
         bytes32 salt = bytes32(uint256(0x1234));
         vm.expectRevert(ICreate3Factory.NotWhitelisted.selector);
-        create3Factory.deploy(salt, creationCode, 0 ether, new bytes(0), 0 ether);
+        create3Factory.deploy(salt, creationCode, keccak256(creationCode), 0 ether, new bytes(0), 0 ether);
     }
 
     function test_SetWhitelistedUser() public {
@@ -205,7 +256,12 @@ contract Create3FactoryTest is Test, GasSnapshot {
         uint256 afterDeploymentExecutionFund
     ) external payable {
         address addr = create3Factory.deploy{value: creationFund + afterDeploymentExecutionFund}(
-            salt, creationCode, creationFund, afterDeploymentExecutionPayload, afterDeploymentExecutionFund
+            salt,
+            creationCode,
+            keccak256(creationCode),
+            creationFund,
+            afterDeploymentExecutionPayload,
+            afterDeploymentExecutionFund
         );
 
         assembly ("memory-safe") {

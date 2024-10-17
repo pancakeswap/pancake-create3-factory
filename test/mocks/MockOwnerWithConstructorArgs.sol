@@ -2,6 +2,7 @@
 pragma solidity ^0.8.26;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {CustomizedProxyChild} from "../../src/CustomizedProxyChild.sol";
 
 contract MockOwnerWithConstructorArgs is Ownable {
     uint256 public args;
@@ -12,5 +13,9 @@ contract MockOwnerWithConstructorArgs is Ownable {
 
     function payMe() external payable {
         // do nothing
+    }
+
+    function tryReEntryChildProxy() external {
+        CustomizedProxyChild(msg.sender).deploy(new bytes(0), 0, new bytes(0), 0);
     }
 }
