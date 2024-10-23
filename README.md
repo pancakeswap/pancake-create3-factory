@@ -1,6 +1,20 @@
-# Pancake-create2-factory
+# Pancake-create3-factory
 
-create2-factory to be used by PCS for v4 or future deployments for deterministic address
+create3-factory to be used by PCS for v4 or future deployments for deterministic address
+
+## Context
+
+create1 was rejected as 
+- its under an EOA (tied to 1 person)
+
+create2 was rejected as
+-  some of v4 contracts takes `WETH` as constructor args
+- `WETH` address can differs across chains
+- this would result in different address across chains 
+
+create3 was selected as
+- deterministic address based on just `salt` 
+- a tweak on the proxy `CustomisedProxyChild.sol` allows us to run some methods (`transferOwnership`)
 
 ## Deployment 
 
