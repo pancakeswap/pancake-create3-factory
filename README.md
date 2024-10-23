@@ -30,6 +30,11 @@ export PRIVATE_KEY=0x
 export ETHERSCAN_API_KEY=xx
 ```
 
+### Create3Factory verification on explorer
+In case contract verification fail when running deployment script, run
+
+`forge verify-contract <address> Create3Factory --watch --chain <chain_id>`
+
 ## Address
 
 Below list the chains this contract has been deployed on:
@@ -38,8 +43,8 @@ Below list the chains this contract has been deployed on:
 
 | Chain         | Address |
 | ------------- | ------------- |
-| BSC           | 0x..  |
-| Sepolia       | 0x..  |
+| BSC           | 0xCC4cBFD415C6cBC67a94E3e231CEA82D145D08df  |
+| Sepolia       | 0xCC4cBFD415C6cBC67a94E3e231CEA82D145D08df  |
 
 ### Mainnet
 
