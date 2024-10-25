@@ -69,6 +69,25 @@ contract Create3FactoryTest is Test, GasSnapshot {
         );
     }
 
+    function test_Deploy_MockOwnerWithConstructorArgs_RevertWithFundsAmountMismatch() public {
+        // 1. prepare salt and creation code
+        bytes32 salt = bytes32(uint256(0x1234));
+        bytes memory creationCode = abi.encodePacked(type(MockOwnerWithConstructorArgs).creationCode, abi.encode(42));
+
+        // 2. prepare owner transfer payload
+        bytes memory afterDeploymentExecutionPayload =
+            abi.encodeWithSelector(Ownable.transferOwnership.selector, expectedOwner);
+
+        // 3. make sure this contract has enough balance
+        vm.deal(address(this), 1 ether);
+
+        // 4. deploy
+        vm.expectRevert(abi.encodeWithSelector(ICreate3Factory.FundsAmountMismatch.selector));
+        create3Factory.deploy{value: 1 ether}(
+            salt, creationCode, keccak256(creationCode), 1 ether, afterDeploymentExecutionPayload, 0.2 ether
+        );
+    }
+
     function test_Deploy_MockOwnerWithConstructorArgs_BubbleUpRevert() public {
         // 1. prepare salt and creation code
         bytes32 salt = bytes32(uint256(0x1234));

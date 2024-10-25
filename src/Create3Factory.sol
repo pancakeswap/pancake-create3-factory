@@ -34,6 +34,7 @@ contract Create3Factory is ICreate3Factory, Ownable2Step, ReentrancyGuard {
         uint256 afterDeploymentExecutionFund
     ) external payable onlyWhitelisted nonReentrant returns (address deployed) {
         if (creationCodeHash != keccak256(creationCode)) revert CreationCodeHashMismatch();
+        if (creationFund + afterDeploymentExecutionFund != msg.value) revert FundsAmountMismatch();
 
         deployed = Create3.create3(
             salt, creationCode, creationFund, afterDeploymentExecutionPayload, afterDeploymentExecutionFund
