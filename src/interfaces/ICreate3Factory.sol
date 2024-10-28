@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 interface ICreate3Factory {
     error NotWhitelisted();
     error CreationCodeHashMismatch();
+    error FundsAmountMismatch();
 
     /**
      * @notice create3 deploy a contract
