@@ -43,12 +43,24 @@ Below list the chains this contract has been deployed on:
 
 | Chain         | Address |
 | ------------- | ------------- |
-| BSC           | 0xCC4cBFD415C6cBC67a94E3e231CEA82D145D08df  |
-| Sepolia       | 0xCC4cBFD415C6cBC67a94E3e231CEA82D145D08df  |
+| BSC           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Sepolia       | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Polygon zkEVM | <wip - failed to get EIP-1559 fee>  |
+| zkSync Era    | <wip - require foundry-zksync>  |
+| Arbitrum One  | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Linea         | <wip - no push0 support>  |
+| Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 
 ### Mainnet
 
 | Chain         | Address |
 | ------------- | ------------- |
-| BSC           | 0x..  |
-| ETH           | 0x..  |
+| BSC           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| ETH           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Polygon zkEVM | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| zkSync Era    | <wip - require foundry-zksync>  |
+| Arbitrum One  | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Linea         | <wip - no push0 support>  |
+| Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
