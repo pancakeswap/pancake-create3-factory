@@ -46,11 +46,13 @@ Below list the chains this contract has been deployed on:
 | BSC           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Sepolia       | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Polygon zkEVM | <wip - failed to get EIP-1559 fee>  |
-| zkSync Era    | <wip - require foundry-zksync>  |
+| zkSync Era    | 0x38ab3f2ce00973a51d3a2a04d634c9bcbf20e4e1  |
 | Arbitrum One  | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Linea         | <wip - no push0 support>  |
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+
+- zksync is verified at https://sepolia-era.zksync.network 
 
 ### Mainnet
 
@@ -59,8 +61,42 @@ Below list the chains this contract has been deployed on:
 | BSC           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | ETH           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Polygon zkEVM | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
-| zkSync Era    | <wip - require foundry-zksync>  |
+| zkSync Era    | 0x38ab3f2ce00973a51d3a2a04d634c9bcbf20e4e1  |
 | Arbitrum One  | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Linea         | <wip - no push0 support>  |
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+
+- zksync is verified at https://era.zksync.network
+
+
+## zkSync guide
+
+Below list the steps to deploy on zkSync
+
+1. Install foundry-zk: https://github.com/matter-labs/foundry-zksync
+
+2. The above installation will overwrite your existing foundry, so do the below to move foundry-zk (forge, cast) in another folder and alias them.
+
+```
+> mv ~/.foundry/bin/forge ~/.foundry/bin/forge-zk
+> mv ~/.foundry/bin/cast ~/.foundry/bin/cast-zk
+> alias forge-zk="$HOME/.foundry/bin/forge-zk"
+> alias cast-zk="$HOME/.foundry/bin/cast-zk"
+```
+
+3. Reinstall foundry: https://getfoundry.sh/introduction/getting-started
+
+4. When deploying, instead of `forge` use `forge-zk` 
+
+5. Verifying
+
+```
+// pre-req: get ether_api_key from etherscan
+
+forge-zk verify-contract {address} Create3Factory --watch \n
+--chain {324 | 320} \n
+--etherscan-api-key {ether_api_key} \n
+--verifier etherscan \n
+--verifier-url "https://api.etherscan.io/v2/api"
+```
