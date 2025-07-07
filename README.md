@@ -64,7 +64,7 @@ Below list the chains this contract has been deployed on:
 | Polygon zkEVM | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | zkSync Era    | 0x38ab3f2ce00973a51d3a2a04d634c9bcbf20e4e1  |
 | Arbitrum One  | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
-| Linea         | rab  |
+| Linea         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 
