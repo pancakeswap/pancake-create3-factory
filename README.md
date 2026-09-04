@@ -51,9 +51,11 @@ Below list the chains this contract has been deployed on:
 | Linea         | 0x38ab3f2ce00973a51d3a2a04d634c9bcbf20e4e1  |
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Robinhood     | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 
 - zksync is verified at https://sepolia-era.zksync.network 
 - linea: https://sepolia.lineascan.build/
+- robinhood: https://explorer.testnet.chain.robinhood.com/
 
 ### Mainnet
 
@@ -67,9 +69,11 @@ Below list the chains this contract has been deployed on:
 | Linea         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Robinhood     | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 
 - zksync is verified at https://era.zksync.network
 - linea : https://lineascan.build/
+- robinhood: https://robinhoodchain.blockscout.com/
 
 
 ## Linea tweaks
