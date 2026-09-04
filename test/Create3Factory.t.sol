@@ -3,8 +3,9 @@ pragma solidity ^0.8.24;
 
 import "forge-std/src/Test.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import {IAccessControlDefaultAdminRules} from
-    "@openzeppelin/contracts/access/extensions/IAccessControlDefaultAdminRules.sol";
+import {
+    IAccessControlDefaultAdminRules
+} from "@openzeppelin/contracts/access/extensions/IAccessControlDefaultAdminRules.sol";
 import {Create3} from "../src/libraries/Create3.sol";
 import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {ICreate3Factory, Create3Factory} from "../src/Create3Factory.sol";
