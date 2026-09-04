@@ -7,6 +7,7 @@ fs_permissions = [
     { access = "read-write", path = ".forge-snapshots/" },
     { access = "read", path = "./foundry-out" },
 ]
+solc = '0.8.26'
 evm_version = 'cancun'
 optimizer_runs = 30_000
 
