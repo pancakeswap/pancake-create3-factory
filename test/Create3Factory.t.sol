@@ -12,6 +12,8 @@ import {ICreate3Factory, Create3Factory} from "../src/Create3Factory.sol";
 import {MockOwnerWithConstructorArgs} from "./mocks/MockOwnerWithConstructorArgs.sol";
 import {MockAccessControlWithConstructorArgs} from "./mocks/MockAccessControlWithConstructorArgs.sol";
 import {CustomizedProxyChild} from "../src/CustomizedProxyChild.sol";
+import {Create3FactoryConstants} from "../script/Create3FactoryConstants.sol";
+import {MockERC20} from "./mocks/MockERC20.sol";
 
 contract Create3FactoryTest is Test, GasSnapshot {
     Create3Factory create3Factory;
@@ -23,6 +25,50 @@ contract Create3FactoryTest is Test, GasSnapshot {
     function setUp() public {
         create3Factory = new Create3Factory();
         create3Factory.setWhitelistUser(pcsDeployer, true);
+    }
+
+    /// @dev KECCAK256_PROXY_CHILD_BYTECODE drives every create3 address. It must be identical to the factory
+    /// deployed on bsc (0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1), otherwise future deployments on new chains
+    /// would produce different addresses. If this fails, check solc version, optimizer settings, remappings and
+    /// CustomizedProxyChild.sol, all of them affect the metadata hash appended to the proxy child creation code.
+    function test_KECCAK256_PROXY_CHILD_BYTECODE_MatchesBsc() public pure {
+        assertEq(
+            keccak256(type(CustomizedProxyChild).creationCode),
+            Create3FactoryConstants.EXPECTED_KECCAK256_PROXY_CHILD_BYTECODE,
+            "KECCAK256_PROXY_CHILD_BYTECODE mismatch with bsc"
+        );
+        assertEq(
+            Create3.KECCAK256_PROXY_CHILD_BYTECODE,
+            Create3FactoryConstants.EXPECTED_KECCAK256_PROXY_CHILD_BYTECODE,
+            "Create3.KECCAK256_PROXY_CHILD_BYTECODE mismatch with bsc"
+        );
+    }
+
+    /// @dev simulate the real deployer (nonce 0) so the factory lands on the same address as bsc,
+    /// then verify computeAddress returns the same value as the factory on bsc
+    function test_ComputeAddress_MatchesBsc() public {
+        address deployer = Create3FactoryConstants.EXPECTED_DEPLOYER;
+        assertEq(vm.getNonce(deployer), 0);
+
+        vm.prank(deployer);
+        Create3Factory factory = new Create3Factory();
+        assertEq(address(factory), Create3FactoryConstants.EXPECTED_FACTORY, "factory address mismatch with bsc");
+
+        assertEq(
+            factory.computeAddress(Create3FactoryConstants.SANITY_SALT),
+            Create3FactoryConstants.EXPECTED_SANITY_ADDRESS,
+            "computeAddress mismatch with bsc"
+        );
+
+        // deploy through the factory and make sure the deployed address is the pre-computed one
+        bytes memory creationCode =
+            abi.encodePacked(type(MockERC20).creationCode, abi.encode("Mock", "MOCK", alice, 1 ether));
+        vm.prank(deployer);
+        address deployed = factory.deploy(
+            Create3FactoryConstants.SANITY_SALT, creationCode, keccak256(creationCode), 0, new bytes(0), 0
+        );
+        assertEq(deployed, Create3FactoryConstants.EXPECTED_SANITY_ADDRESS);
+        assertEq(MockERC20(deployed).balanceOf(alice), 1 ether);
     }
 
     function test_Deploy_MockOwnerWithConstructorArgs() public {
