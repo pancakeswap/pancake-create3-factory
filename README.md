@@ -30,10 +30,45 @@ export PRIVATE_KEY=0x
 export ETHERSCAN_API_KEY=xx
 ```
 
+### Local dry run on anvil
+`./script/local-deploy-test.sh` starts an anvil, funds the deployer, runs the deploy script with `--broadcast` and checks the
+factory address, `owner()`, `computeAddress` and `KECCAK256_PROXY_CHILD_BYTECODE` against the values on BSC.
+`PRIVATE_KEY` in `.env` must be the original deployer. Pass `--dry-run` to only simulate the script.
+
 ### Create3Factory verification on explorer
 In case contract verification fail when running deployment script, run
 
 `forge verify-contract <address> Create3Factory --watch --chain <chain_id>`
+
+### Keeping create3 addresses identical across chains
+
+The address of a contract deployed through the factory is derived from `(factory address, salt, KECCAK256_PROXY_CHILD_BYTECODE)`.
+`KECCAK256_PROXY_CHILD_BYTECODE` is `keccak256(type(CustomizedProxyChild).creationCode)` and is baked into the factory at compile time.
+The creation code ends with the solc metadata hash, so **any** change to the solc version, optimizer settings, evm version,
+remappings (they are part of the metadata) or `CustomizedProxyChild.sol` changes the hash, and every future create3 address with it.
+
+Reference values from the factory live on BSC (`0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1`) are stored in
+[script/Create3FactoryConstants.sol](script/Create3FactoryConstants.sol):
+
+| Item | Value |
+| ---- | ----- |
+| deployer (nonce 0) | `0xDB1fa6562f3784643c1b547b17dcAEDE0b79CA80` |
+| KECCAK256_PROXY_CHILD_BYTECODE | `0x062e0b9e0e28785406fcd3ea3efde49e1d40668774057ec7ba53f120d0809763` |
+| computeAddress(0x1234) | `0xC9025a31E39f73AD2B0c7Ce16cceC6A3416e52E0` |
+
+They are enforced in three places:
+- `script/01_DeployCreate3Factory.s.sol` reverts **before** broadcasting if the deployer would not produce the same factory
+  address or if the compiled `KECCAK256_PROXY_CHILD_BYTECODE` differs, and re-checks `computeAddress` after deployment.
+- `test/Create3Factory.t.sol` (`test_KECCAK256_PROXY_CHILD_BYTECODE_MatchesBsc`, `test_ComputeAddress_MatchesBsc`) fails on any mismatch.
+- `test/Create3FactoryFork.t.sol` (`test_Deploy_OpenZeppelinERC20_LocalVsBscFork`) deploys an OpenZeppelin ERC20 through the
+  factory live on BSC (fork) and through a locally compiled factory deployed by the real deployer with nonce 0 on a second BSC
+  fork where the on-chain factory has been wiped (so the local build lands on the same address), and asserts both addresses match.
+  It uses `MAINNET_FORK_URL_BSC` when set and falls back to a public BSC rpc otherwise.
+
+Do not change `foundry.toml` (`solc = '0.8.26'`, `evm_version = 'cancun'`, `optimizer_runs = 30_000`) or `remappings.txt`
+without confirming the tests above still pass. Note that `remappings.txt` deliberately lists the seven remappings that
+were part of the original build; newer forge versions would otherwise drop the redundant `@openzeppelin/contracts/` entry
+and change the metadata hash.
 
 ## Address
 

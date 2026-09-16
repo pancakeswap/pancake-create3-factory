@@ -7,7 +7,14 @@ fs_permissions = [
     { access = "read-write", path = ".forge-snapshots/" },
     { access = "read", path = "./foundry-out" },
 ]
+solc = '0.8.26'
+auto_detect_solc = false
 evm_version = 'cancun'
+optimizer = true
 optimizer_runs = 30_000
+via_ir = false
+bytecode_hash = 'ipfs'
+cbor_metadata = true
+auto_detect_remappings = false
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

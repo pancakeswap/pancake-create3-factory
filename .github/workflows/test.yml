@@ -19,7 +19,9 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly-471e4ac317858b3419faaee58ade30c0671021e0 # Nightly (2024-10-03)
+          # pinned: remappings handling differs between forge versions and changes KECCAK256_PROXY_CHILD_BYTECODE,
+          # see "Keeping create3 addresses identical across chains" in README before bumping
+          version: v1.8.1
 
       - name: Run tests
         run: forge test -vvv --isolate
