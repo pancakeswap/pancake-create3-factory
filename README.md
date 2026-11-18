@@ -105,10 +105,12 @@ Below list the chains this contract has been deployed on:
 | Base          | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | opBnb         | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 | Robinhood     | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
+| Arc           | 0x38Ab3f2CE00973A51d3A2A04d634C9bcbf20e4e1  |
 
 - zksync is verified at https://era.zksync.network
 - linea : https://lineascan.build/
 - robinhood: https://robinhoodchain.blockscout.com/
+- arc: https://explorer.arc.io/
 
 
 ## Linea tweaks
